@@ -52,7 +52,7 @@ var _ = Describe("UpgradeMssqlDBFailoverTest", Label("mssql-db-failover"), func(
 			defer serverInstanceSecondary.Delete()
 
 			By("creating a failover group service instance")
-			fogConfig := failoverGroupConfig(serversConfig.ServerPairTag)
+			fogConfig := failoverGroupConfig(serversConfig.ServerPairTag, serversConfig.ServerPairsConfig())
 			initialFogInstance := services.CreateInstance(
 				"csb-azure-mssql-db-failover-group",
 				"small",
@@ -170,11 +170,12 @@ func newServerPair(resourceGroup string) DatabaseServerPair {
 	}
 }
 
-func failoverGroupConfig(serverPairTag string) map[string]string {
-	return map[string]string{
-		"instance_name": random.Name(random.WithPrefix("fog")),
-		"db_name":       random.Name(random.WithPrefix("db")),
-		"server_pair":   serverPairTag,
+func failoverGroupConfig(serverPairTag, serverCreds interface{}) map[string]interface{} {
+	return map[string]interface{}{
+		"instance_name":           random.Name(random.WithPrefix("fog")),
+		"db_name":                 random.Name(random.WithPrefix("db")),
+		"server_pair":             serverPairTag,
+		"server_credential_pairs": serverCreds,
 	}
 }
 
